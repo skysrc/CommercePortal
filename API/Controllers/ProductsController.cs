@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using API.Data;
+using API.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace API.Controllers
@@ -13,22 +16,25 @@ namespace API.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly ILogger<ProductsController> _logger;
+        private readonly StoreContext _context;
 
-        public ProductsController(ILogger<ProductsController> logger)
+        public ProductsController(ILogger<ProductsController> logger, StoreContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         [HttpGet]
-        public string GetProducts()
+        public async Task<ActionResult<List<Product>>> GetProducts()
         {
-            return "this will be a list of products";
+            var products = await _context.Products.ToListAsync();
+            return Ok(products);
         }
 
         [HttpGet("{id}")]
-        public string GetProduct(string id)
+        public async Task<ActionResult<Product>> GetProduct(string id)
         {
-            return "single product";
+            return await _context.Products.FindAsync(id);
         }
     }
 }
